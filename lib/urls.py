@@ -1,31 +1,42 @@
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin, urlunsplit
 
 
-def sanitize_url(url, comparison=None):
-    oo = urlparse(url)
-    if not comparison:
-        if oo.scheme:
-            return url
-        else:
-            return 'http://' + url
-
-    od = urlparse(comparison)
-
-    # Do both urls have a scheme?
-    if oo.scheme and od.scheme:
-        # Then there's nothing left to do!
+def sanitize_url(url):
+    if url.startswith('http://') or url.startswith('https://'):
         return url
-
-    # Otherwise, do they have the same netloc?
-    if oo.netloc == od.netloc:
-        # The destination is a relative url.
-        return 'http://' + url
-
-    # The destination probably just lacks a scheme.
+    
+    if url.startswith('//'):
+        return 'http:' + url
+    
     return 'http://' + url
+
+
+def sanitize_links(origin, destination):
+    # Is it an unsupported scheme?
+    blacklist = ['mailto:', 'ftp:']
+    for scheme in blacklist:
+        if destination.startswith(scheme):
+            return False
+
+    # If its already an absolute url, do nothing.
+    if destination.startswith('http://') or destination.startswith('https://'):
+        return destination
+
+    # Is it a fragment?
+    if destination[0] == '#':
+        return urljoin(origin, destination)
+
+    # Is it a relative path?
+    if destination[0] == '/':
+        return urljoin(origin, destination)
 
 
 def same_origin(a, b):
     oa = urlparse(a)
     ob = urlparse(b)
     return oa.netloc == ob.netloc
+
+
+def domain_only(url):
+    o = urlparse(url)
+    return urlunsplit((o.scheme, o.netloc, '', '', ''))

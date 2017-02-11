@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 from lib.http import download
-from lib.urls import sanitize_url, same_origin
+from lib.urls import sanitize_links, same_origin, domain_only
 
 
 class Scraper:
@@ -27,22 +27,16 @@ class Scraper:
             html = download(site)
 
         soup = BeautifulSoup(html, 'html.parser')
-        links = soup.find_all('a')
+        links = [link.get('href') for link in soup.find_all('a') if link.get('href')]
 
         inbound = []
         outbound = []
         for link in links:
-            try:
-                if link['href']:
-                    link = link['href']
-            except:
-                continue
-
-            link = sanitize_url(url=link, comparison=site)
+            link = sanitize_links(origin=site, destination=link)
 
             if same_origin(link, site):
                inbound.append(link)
             else:
-               outbound.append(link)
+               outbound.append(domain_only(link))
 
         return [x for x in set(inbound)], [x for x in set(outbound)]

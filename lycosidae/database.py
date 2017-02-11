@@ -6,7 +6,7 @@ from lib.paths import database_path
 
 
 database_url = 'sqlite:///' + database_path
-engine = create_engine(database_url, echo=False)
+engine = create_engine(database_url, echo=True)
 
 Session = sessionmaker(bind=engine)
 session = Session()

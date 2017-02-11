@@ -19,12 +19,4 @@ class Site(Base):
                          .limit(10)
 
     def __init__(self, url, wordpress=None, last_checked=None):
-        self.url = sanitize_url(url)
-
-        if wordpress:
-            self.wordpress = wordpress
-        if last_checked:
-            self.last_checked = last_checked
-
-        session.add(self)
-        session.commit()
+        self.url = url
