@@ -1,0 +1,5 @@
+database.db
+
+*.egg-info/
+*__pycache_/
+*.pyc
