@@ -25,7 +25,7 @@ class WordPress:
             try:
                 if 'stylesheet' in link.get('rel'):
                     if 'wp-content' in link.get('href'):
-                        is_wordpress = True
+                        self.is_wordpress = True
                         return
             except:
                 continue

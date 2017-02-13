@@ -40,7 +40,7 @@ def sanitize_url(url):
         return False
 
     # Irrelevant schemes
-    blacklist = ['mailto:', 'ftp:', 'irc:', 'javascript:']
+    blacklist = ['mailto:', 'ftp:', 'irc:', 'javascript:', 'tel:']
     for scheme in blacklist:
         if url.startswith(scheme):
             return False
@@ -79,8 +79,9 @@ def sanitize_url(url):
         domain_tld = '.' + domain_tld
 
     # Is the tld blacklisted?
-    if domain_tld in SETTINGS['URL_TLD_BLACKLIST']:
-        return False
+    for blacklist in SETTINGS['URL_TLD_BLACKLIST']:
+        if blacklist in domain_tld:
+            return False
 
     # Strip everything!
     url = url.replace(domain_tld, '')
