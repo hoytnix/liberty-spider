@@ -1,7 +1,5 @@
-from os import path, walk
-from urllib.parse import urlparse, urljoin, urlunsplit
-
-from lycosidae.settings import SETTINGS
+from os import path
+from os import walk
 
 
 def all_tlds():
@@ -17,16 +15,7 @@ def all_tlds():
                     x.append(line.strip())
     return set(x)
 
-
-def sanitize_url(url):
-    """Marshals all URLs to be compatible with the database.
-    
-    If it returns False then skip it.
-    """
-
-    # Normalize
-    url = url.lower()
-
+def clean(url):
     # Fragment
     if url.startswith('#'):
         return False
@@ -40,7 +29,7 @@ def sanitize_url(url):
         return False
 
     # Irrelevant schemes
-    blacklist = ['mailto:', 'ftp:', 'irc:', 'javascript:']
+    blacklist = ['mailto:', 'ftp:']
     for scheme in blacklist:
         if url.startswith(scheme):
             return False
@@ -78,10 +67,6 @@ def sanitize_url(url):
     else:
         domain_tld = '.' + domain_tld
 
-    # Is the tld blacklisted?
-    if domain_tld in SETTINGS['URL_TLD_BLACKLIST']:
-        return False
-
     # Strip everything!
     url = url.replace(domain_tld, '')
     domain_name = url.split('.')[-1]
@@ -89,12 +74,6 @@ def sanitize_url(url):
     return scheme + domain_name + domain_tld
 
 
-def same_origin(a, b):
-    oa = urlparse(a)
-    ob = urlparse(b)
-    return oa.netloc == ob.netloc
-
-
-def domain_only(url):
-    o = urlparse(url)
-    return urlunsplit((o.scheme, o.netloc, '', '', ''))
+if __name__ == '__main__':
+    x = clean('https://blog.hoyt.co.uk/hello')
+    print(x)

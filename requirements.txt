@@ -1,5 +1,5 @@
 # HTTP
-beautifulsoup4==4.5.3
+beautifulsoup4
 requests
 
 # Database
@@ -8,3 +8,11 @@ alembic
 
 # CLI
 click
+
+# Settings
+anyconfig
+pyyaml
+
+# Dev
+pep257
+yapf

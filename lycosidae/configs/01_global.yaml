@@ -1,0 +1,10 @@
+ENGINE_QUEUE_SIZE: 1
+ENGINE_CONCURRENCY: 2
+
+# Search only pages linked from the homepage.
+SCRAPER_SEARCH_DEPTH: 1
+
+HTTP_TIMEOUT_SECS: 3
+URL_TLD_BLACKLIST:
+    - .gov
+    - .mil

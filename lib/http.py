@@ -2,14 +2,14 @@ import sys
 
 import requests
 
+from lycosidae.settings import SETTINGS
+
 
 def download(url, file_path=None):
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (compatible)'
-        }
+        headers = {'User-Agent': 'Mozilla/5.0 (compatible)'}
 
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=SETTINGS['HTTP_TIMEOUT_SECS'])
         html = r.content
 
         if file_path:
@@ -19,5 +19,5 @@ def download(url, file_path=None):
 
         return html.decode('utf-8', errors='ignore')
     except:
-        print("Unexpected error: %s" % sys.exc_info()[0])
+        print("{} {}".format(sys.exc_info()[0], url))
         return False

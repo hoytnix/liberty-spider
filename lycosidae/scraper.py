@@ -1,7 +1,9 @@
 from bs4 import BeautifulSoup
 
+from lycosidae.settings import SETTINGS
+
 from lib.http import download
-from lib.urls import sanitize_links, same_origin, domain_only
+from lib.urls import sanitize_url, same_origin, domain_only
 
 
 class Scraper:
@@ -10,7 +12,7 @@ class Scraper:
         inbound, outbound = self.links_from_page(site, html=html)
 
         current_depth = inbound
-        for depth in range(1):
+        for depth in range(SETTINGS['SCRAPER_SEARCH_DEPTH']):
             next_depth = []
             for link in current_depth:
                 o_inbound, o_outbound = self.links_from_page(link)
@@ -25,18 +27,25 @@ class Scraper:
     def links_from_page(self, site, html=None):
         if not html:
             html = download(site)
+            if not html:
+                return [], [] # the page did not download!
 
         soup = BeautifulSoup(html, 'html.parser')
-        links = [link.get('href') for link in soup.find_all('a') if link.get('href')]
+        links = []
+        for link in soup.find_all('a'):
+            if link.get('href'):
+                links.append(link.get('href'))
 
         inbound = []
         outbound = []
         for link in links:
-            link = sanitize_links(origin=site, destination=link)
+            link = sanitize_url(link)
+            if not link:
+                continue
 
             if same_origin(link, site):
-               inbound.append(link)
+                inbound.append(link)
             else:
-               outbound.append(domain_only(link))
+                outbound.append(domain_only(link))
 
         return [x for x in set(inbound)], [x for x in set(outbound)]

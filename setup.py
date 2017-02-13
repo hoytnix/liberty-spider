@@ -7,7 +7,7 @@ import sys
 import setuptools
 
 PACKAGE_NAME = 'lycosidae'
-MINIMUM_PYTHON_VERSION = 3, 5
+MINIMUM_PYTHON_VERSION = 3, 6
 
 
 def check_python_version():

@@ -1,7 +1,11 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+import datetime
+
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, \
+    inspect
 
 from lib.urls import sanitize_url
 from lycosidae.database import Base, session
+from lycosidae.settings import SETTINGS
 
 
 class Site(Base):
@@ -12,11 +16,18 @@ class Site(Base):
     wordpress = Column(Boolean, default=False)
     last_checked = Column(DateTime, default=None)
 
-    @property
-    def queue(self):
-        return Site.query.filter(Site.wordpress == False) \
-                         .filter(Site.last_checked != None)\
-                         .limit(10)
+    def update_profile(self, profile):
+        self.wordpress = profile
+        session.merge(self)
+        session.commit()     
 
-    def __init__(self, url, wordpress=None, last_checked=None):
-        self.url = url
+    def update_last_checked(self):
+        self.last_checked = datetime.datetime.utcnow()
+        session.merge(self)
+        session.commit()
+
+    @classmethod
+    def queue(self):
+        return session.query(Site).filter_by(wordpress=False) \
+                                  .filter_by(last_checked=None) \
+                                  .limit(SETTINGS['ENGINE_QUEUE_SIZE'])

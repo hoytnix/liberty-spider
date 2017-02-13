@@ -1,0 +1,7 @@
+ENGINE_QUEUE_SIZE: 50
+ENGINE_CONCURRENCY: 4
+
+# Search only pages linked from the homepage.
+SCRAPER_SEARCH_DEPTH: 0
+
+HTTP_TIMEOUT_SECS: 3.05
