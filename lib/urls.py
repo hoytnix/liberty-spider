@@ -40,7 +40,10 @@ def sanitize_url(url):
         return False
 
     # Irrelevant schemes
-    blacklist = ['mailto:', 'ftp:', 'irc:', 'javascript:', 'tel:']
+    blacklist = [
+        'mailto:', 'ftp:', 'irc:', 'javascript:', 'tel:', 'rtmp:', 'rtsp:',
+        'webcal:', 'itpc:'
+    ]
     for scheme in blacklist:
         if url.startswith(scheme):
             return False

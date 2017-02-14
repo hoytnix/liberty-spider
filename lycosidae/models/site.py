@@ -28,6 +28,29 @@ class Site(Base):
 
     @classmethod
     def queue(self):
-        return session.query(Site).filter_by(wordpress=False) \
-                                  .filter_by(last_checked=None) \
+        return session.query(Site).filter_by(last_checked=None) \
+                                  .order_by(Site.id) \
                                   .limit(SETTINGS['ENGINE_QUEUE_SIZE'])
+                                  
+    @classmethod
+    def queue_next(self):
+        from random import random
+
+        table = session.query(Site)
+        row_count = int(table.count())
+
+        s = None
+        while True:
+            s = ( session.query(Site).filter_by(last_checked=None)
+                    # should eliminate duplicate requests
+                    .offset(
+                        random() * row_count
+                    )
+                    .limit(1)
+                    .first()
+                )
+            if s is not None:
+                break
+
+        s.update_last_checked()
+        return s

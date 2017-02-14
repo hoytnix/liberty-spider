@@ -18,6 +18,10 @@ def download(url, file_path=None):
             return file_path
 
         return html.decode('utf-8', errors='ignore')
+    except requests.exceptions.ConnectTimeout:
+        return False
+    except requests.exceptions.ConnectionError:
+        return False
     except:
         print("{} {}".format(sys.exc_info()[0], url))
         return False

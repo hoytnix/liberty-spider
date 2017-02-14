@@ -31,7 +31,7 @@ def reset():
     Base.metadata.create_all(engine)
 
     # Seed
-    new_site = Site(url='http://hoyt.io')
+    new_site = Site(url='https://ma.tt')
     session.add(new_site)
     session.commit()
     session.refresh(new_site)
@@ -41,7 +41,7 @@ def reset():
 @click.command()
 def seed():
     """ Seeds the database. """
-    new_site = Site(url='http://hoyt.io')
+    new_site = Site(url='https://ma.tt')
     session.add(new_site)
     session.commit()
     session.refresh(new_site)

@@ -1,4 +1,5 @@
 database.db
+exit-flag.txt
 
 *.egg-info/
 *__pycache_/
