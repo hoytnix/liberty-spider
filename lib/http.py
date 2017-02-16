@@ -5,7 +5,7 @@ import requests
 from lycosidae.settings import SETTINGS
 
 
-def download(url, file_path=None):
+def download(url, file_path=None, original_url=None):
     try:
         headers = {'User-Agent': 'Mozilla/5.0 (compatible)'}
 
@@ -18,10 +18,18 @@ def download(url, file_path=None):
             return file_path
 
         return html.decode('utf-8', errors='ignore')
+
+    # Ignore all these exceptions.
     except requests.exceptions.ConnectTimeout:
         return False
     except requests.exceptions.ConnectionError:
         return False
+    except requests.exceptions.ReadTimeout:
+        return False
+    except requests.exceptions.TooManyRedirects:
+        return False
+
+    # Capture the rest.
     except:
-        print("{} {}".format(sys.exc_info()[0], url))
+        print(sys.exc_info()[0], 'ORIGINAL', original_url, 'ACTUAL', url)
         return False

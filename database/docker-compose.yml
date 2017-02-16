@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+  db:
+    image: "mysql:5.7"
+    ports:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: dbname
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+  pma:
+    image: "phpmyadmin/phpmyadmin:latest"
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: db
+      PMA_USER: user
+      PMA_PASSWORD: pass
+  pma2:
+    image: "phpmyadmin/phpmyadmin:latest"
+    ports:
+      - 8090:80
+    environment:
+      PMA_HOST: 45.63.78.127
+      PMA_USER: lycosidae
+      PMA_PASSWORD: iL0v3Pl0x1337

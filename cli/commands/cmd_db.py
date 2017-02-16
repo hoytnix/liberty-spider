@@ -1,7 +1,6 @@
 import click
 
 from lycosidae.database import Base, engine, session
-from lycosidae.models.site import Site
 
 
 @click.group()
@@ -22,32 +21,26 @@ def init():
 def reset():
     """ Deletes the current database and creates new tables. """
     
+    # Import
+    from lycosidae.models.site import Site
+
+    print("Imported.")
+
     # Delete
-    from lib.paths import database_path
-    with open(database_path, 'w+') as stream:
-        pass
+    Base.metadata.drop_all(engine)
+
+    print("Deleted.")
 
     # Create tables
     Base.metadata.create_all(engine)
 
+    print("Created.")
+
     # Seed
-    new_site = Site(url='https://ma.tt')
-    session.add(new_site)
-    session.commit()
-    session.refresh(new_site)
-    session.close()
+    Site.insert(url='https://ma.tt')
 
-
-@click.command()
-def seed():
-    """ Seeds the database. """
-    new_site = Site(url='https://ma.tt')
-    session.add(new_site)
-    session.commit()
-    session.refresh(new_site)
-    session.close()
+    print("Populated.")
 
 
 cli.add_command(init)
 cli.add_command(reset)
-cli.add_command(seed)

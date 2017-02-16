@@ -1,38 +1,53 @@
-import pprint
+from pprint import PrettyPrinter
 from concurrent.futures import ProcessPoolExecutor
 
-from sqlalchemy.sql import exists
-
+# Config
 from lycosidae.settings import SETTINGS
-from lycosidae.database import session
-from lycosidae.models.site import Site
+# Functions
 from lycosidae.wordpress import WordPress
 from lycosidae.scraper import Scraper
-
+# Models
+from lycosidae.models.site import Site
+# Library
 from lib.http import download
 from lib.paths import exit_path
 
 
 class Lycosidae:
     def __init__(self):
-        #worker()
-        #return
-
-        pprint.PrettyPrinter(indent=4).pprint(SETTINGS)
+        PrettyPrinter(indent=4).pprint(SETTINGS)
 
         # Create new exit-flag file.
         with open(exit_path, 'w+') as stream:
             pass
-        self.do_work = True
 
-        with ProcessPoolExecutor(max_workers=SETTINGS['ENGINE_CONCURRENCY']) as e:
-            for _ in e.map(self.worker, range(SETTINGS['ENGINE_CONCURRENCY'])):
-                _ = None
+        while True:
+            # Collect results.
+            if SETTINGS['ENGINE_CONCURRENCY'] > 0:
+                with ProcessPoolExecutor(max_workers=SETTINGS['ENGINE_CONCURRENCY']) as e:
+                    for _ in e.map(self.worker, range(SETTINGS['ENGINE_CONCURRENCY'])):
+                        _ = None
+            else:
+                self.worker()
 
+            # Graceful shutdown.
+            with open(exit_path, 'r') as stream:
+                if 'quit' in stream.read().strip().lower():
+                    break
 
     def worker(self, process=None):
         while True:
-            site = Site.queue_next()
+            # Graceful shutdown.
+            with open(exit_path, 'r') as stream:
+                if 'quit' in stream.read().strip().lower():
+                    break
+
+            # ----- Work -----
+
+            site = Site.next()
+            if not site:
+                continue
+
             html = download(site.url)
             if not html:
                 continue # TODO: update the db with the result
@@ -45,18 +60,8 @@ class Lycosidae:
             # Scraper
             scraper = Scraper(site=site.url, html=html)
             for result in scraper.results:
-                if not session.query(exists().where(Site.url == result)).scalar():
-                    new_site = Site(url=result)
-                    session.add(new_site)
-                    session.commit()
+                Site.insert(url=result)
 
+            # Log
             log_str = '[{}] {}'.format(process, site.url)
             print(log_str)
-
-            # Graceful shutdown.
-            with open(exit_path, 'r') as stream:
-                if stream.read().strip().lower() == 'quit':
-                    self.do_work = False
-
-            if not self.do_work:
-                break

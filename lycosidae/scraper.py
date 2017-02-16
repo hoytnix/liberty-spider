@@ -39,7 +39,12 @@ class Scraper:
         inbound = []
         outbound = []
         for link in links:
-            link = sanitize_url(link)
+            original_link = link + ''
+            link = sanitize_url(link, origin=site)
+
+            #if link:
+            #    download(link, original_url=original_link)
+            
             if not link:
                 continue
 

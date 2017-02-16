@@ -1,4 +1,3 @@
-ENGINE_QUEUE_SIZE: 50
 ENGINE_CONCURRENCY: 4
 
 # Search only pages linked from the homepage.

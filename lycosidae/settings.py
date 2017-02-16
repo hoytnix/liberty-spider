@@ -2,45 +2,44 @@ from os import path, walk
 
 import anyconfig
 
+from lib.paths import env_path
 
-def make_settings(environment='develop'):
-    """Ordered object for configuration.
 
-    Loops through files in the `configs`-directory by weight, and breaks after 
-    it finishes the file which contains the `environment` key.
+class Settings(dict):
+    def __init__(self, environment='develop'):
+        """Ordered object for configuration.
 
-    Args:
-        environment (str): they file-key to break at; defaults to `develop`.
+        Loops through files in the `configs`-directory by weight, and breaks after 
+        it finishes the file which contains the `environment` key.
 
-    Returns:
-        dict
-    """
+        Args:
+            environment (str): they file-key to break at; defaults to `develop`.
 
-    cwd = path.dirname(path.abspath(__file__))
-    config_dir = path.join(cwd, 'configs')
+        Returns:
+            dict
+        """
 
-    config_files = []
-    for (root, _, file_names) in walk(config_dir):
-        for file_name in file_names:
-            config_files.append(path.join(root, file_name))
-    config_files = sorted(config_files)
+        cwd = path.dirname(path.abspath(__file__))
+        config_dir = path.join(cwd, 'configs')
 
-    store = {}
-    for config_file in config_files:
-        config = anyconfig.load(config_file)
-        for key in config:
-            store[key] = config[key]
+        config_files = []
+        for (root, _, file_names) in walk(config_dir):
+            for file_name in file_names:
+                config_files.append(path.join(root, file_name))
+        config_files = sorted(config_files)
 
-        if environment in config_file:
-            break
+        for config_file in config_files:
+            config = anyconfig.load(config_file)
+            for key in config:
+                self[key] = config[key]
 
-    return store
-
+            if environment in config_file:
+                break
 
 try:
-    with open(path.join(path.dirname(path.abspath(__file__)), 'env.txt')) as stream:
+    with open(env_path, 'r') as stream:
         ENV = stream.read().strip()
 except:
    ENV = None
 
-SETTINGS = make_settings(environment=ENV)
+SETTINGS = Settings(environment=ENV)
