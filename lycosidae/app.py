@@ -1,10 +1,10 @@
-import logging
 from pprint import PrettyPrinter
 from concurrent.futures import ProcessPoolExecutor
 from asyncio import Queue
 
 # Config
 from lycosidae.settings import SETTINGS
+from lycosidae.log import logger
 # Functions
 from lycosidae.wordpress import WordPress
 from lycosidae.scraper import Scraper
@@ -12,12 +12,11 @@ from lycosidae.scraper import Scraper
 from lycosidae.models.site import Site
 # Library
 from lib.http import download
-from lib.paths import exit_path, log_path
+from lib.paths import exit_path
 
 
 class Lycosidae:
     def __init__(self):
-        logging.basicConfig(filename=log_path, level=logging.INFO)
         PrettyPrinter(indent=4).pprint(SETTINGS)
 
         # Create new exit-flag file.

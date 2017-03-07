@@ -3,6 +3,8 @@ URL_TLD_BLACKLIST:
     - .gov
     - .mil
 
+    - .loan
+
     - .cn    # China
     - .hk    # Hong Kong
     - .tw    # Taiwan

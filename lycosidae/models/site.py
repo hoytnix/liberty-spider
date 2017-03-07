@@ -84,3 +84,12 @@ class Site(Base):
         #        if count > 3:
         #            print('[CRITICAL] Loss of data!')
         return
+
+    @classmethod
+    def bulk_insert(cls, urls):
+        session.bulk_save_objects([Site(url=url) for url in urls])
+        session.commit()
+
+    @classmethod
+    def is_unique(cls, url):
+        return session.query(exists().where(Site.url == url)).scalar()

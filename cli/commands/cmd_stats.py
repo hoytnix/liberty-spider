@@ -6,7 +6,7 @@ import click
 @click.command()
 def cli():
     """Run the program."""
-    update_increment_seconds = 120
+    update_increment_seconds = 10
 
     last_count = None
     _set = []

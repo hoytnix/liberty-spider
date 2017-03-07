@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 
 from lycosidae.settings import SETTINGS
+from lycosidae.log import logger
 
 from lib.http import download
 from lib.urls import sanitize_url, same_origin, domain_only
@@ -42,15 +43,16 @@ class Scraper:
             original_link = link + ''
             link = sanitize_url(link, origin=site)
 
-            #if link:
-            #    download(link, original_url=original_link)
-            
             if not link:
                 continue
 
-            if same_origin(link, site):
+            if same_origin(destination=link, origin=site):
                 inbound.append(link)
             else:
-                outbound.append(domain_only(link))
+                l = domain_only(link)
+                if l == '':
+                    logger.debug(link)
+                else:
+                    outbound.append(domain_only(link))
 
         return [x for x in set(inbound)], [x for x in set(outbound)]
