@@ -1,5 +1,7 @@
+import logging
 from pprint import PrettyPrinter
 from concurrent.futures import ProcessPoolExecutor
+from asyncio import Queue
 
 # Config
 from lycosidae.settings import SETTINGS
@@ -10,11 +12,12 @@ from lycosidae.scraper import Scraper
 from lycosidae.models.site import Site
 # Library
 from lib.http import download
-from lib.paths import exit_path
+from lib.paths import exit_path, log_path
 
 
 class Lycosidae:
     def __init__(self):
+        logging.basicConfig(filename=log_path, level=logging.INFO)
         PrettyPrinter(indent=4).pprint(SETTINGS)
 
         # Create new exit-flag file.
@@ -26,7 +29,8 @@ class Lycosidae:
             if SETTINGS['ENGINE_CONCURRENCY'] > 0:
                 with ProcessPoolExecutor(max_workers=SETTINGS['ENGINE_CONCURRENCY']) as e:
                     for _ in e.map(self.worker, range(SETTINGS['ENGINE_CONCURRENCY'])):
-                        _ = None
+                        pass
+                        #_ = None
             else:
                 self.worker()
 

@@ -8,10 +8,18 @@ class WordPress:
     def __init__(self, url, html=None):
         self.is_wordpress = False
         if not html:
-            html = download(url)
+            html = download(url).lower()
         """ Homepage HTML -->
                 Let's try not to hit up too many pages. :)
         """
+
+        # TODO: Clean this code up...
+        keys = ['wp-content', 'wp-includes', 'wp-admin']
+        for key in keys:
+            if key in html:
+                self.is_wordpress = True
+                return
+        return
 
         # First check the footer.
         if 'proudly powered by wordpress' in html.lower():

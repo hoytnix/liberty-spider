@@ -1,10 +1,12 @@
+import logging
 from datetime import datetime
 from random import random
 
-from sqlalchemy import Column, Integer, Boolean, DateTime, Text, func
+from sqlalchemy import Column, Integer, Boolean, DateTime, Text, String, func, exc
 from sqlalchemy.sql import exists
 
 from lycosidae.database import Base, session
+from lib.urls import schemeless
 
 
 class Site(Base):
@@ -64,10 +66,18 @@ class Site(Base):
         #count = 0
         #while True:
         #    try:
+
+        # Sanatize.
+        url = schemeless(url)
+
         if not session.query(exists().where(Site.url == url)).scalar():
             new_site = Site(url=url)
             session.add(new_site)
             session.commit()
+        else:
+            logging.info('DUPLICATE ' + url)
+            session.rollback()
+
         #        return
         #    except sqlalchemy.exc.OperationalError:
         #        count += 1

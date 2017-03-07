@@ -1,5 +1,6 @@
 database.db
 exit-flag.txt
+lycos.log
 
 *.egg-info/
 *__pycache_/

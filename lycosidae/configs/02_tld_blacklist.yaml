@@ -3,5 +3,28 @@ URL_TLD_BLACKLIST:
     - .gov
     - .mil
 
-    # China
-    - .cn
+    - .cn    # China
+    - .hk    # Hong Kong
+    - .tw    # Taiwan
+
+    - .ae    # United Arab Emirates
+    - .af    # Afghanistan
+    - .al    # Albania
+    - .cu    # Cuba
+    - .dz    # Algeria
+    - .eg    # Egypt
+    - .ge    # Georgia
+    - .in    # India
+    - .iq    # Irag
+    - .ir    # Iran
+    - .kg    # Kyrgyzstan
+    - .kp    # Democratic People's Republic of Korea
+    - .kz    # Kazakhstan
+    - .pk    # Pakistan
+    - .ps    # Palestine
+    - .qa    # Qatar
+    - .sa    # Saudi Arabia
+    - .tj    # Tajikistan
+    - .uz    # Uzbekistan
+    - .vn    # Vietnam
+    - .ye    # Yemen

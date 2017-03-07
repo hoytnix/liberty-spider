@@ -3,10 +3,13 @@ import sys
 import requests
 
 from lycosidae.settings import SETTINGS
+from lib.urls import sanitize_url
 
 
 def download(url, file_path=None, original_url=None):
     try:
+        url = sanitize_url(url, origin=original_url)
+
         headers = {'User-Agent': 'Mozilla/5.0 (compatible)'}
 
         r = requests.get(url, headers=headers, timeout=SETTINGS['HTTP_TIMEOUT_SECS'])

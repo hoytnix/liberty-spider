@@ -18,11 +18,3 @@ services:
       PMA_HOST: db
       PMA_USER: user
       PMA_PASSWORD: pass
-  pma2:
-    image: "phpmyadmin/phpmyadmin:latest"
-    ports:
-      - 8090:80
-    environment:
-      PMA_HOST: 45.63.78.127
-      PMA_USER: lycosidae
-      PMA_PASSWORD: iL0v3Pl0x1337
