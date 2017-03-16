@@ -6,8 +6,8 @@ from asyncio import Queue
 from lycosidae.settings import SETTINGS
 from lycosidae.log import logger
 # Functions
-from lycosidae.wordpress import WordPress
-from lycosidae.scraper import Scraper
+from lycosidae.tasks.crawl import Scraper
+from lycosidae.tasks.profile import WordPress
 # Models
 from lycosidae.models.site import Site
 # Library
@@ -57,7 +57,7 @@ class Lycosidae:
 
             # Profiler
             wordpress = WordPress(url=site.url, html=html)
-            profile = wordpress.is_wordpress
+            profile = {'wordpress': wordpress.is_wordpress}
             site.update_profile(profile)
 
             # Scraper

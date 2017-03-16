@@ -1,0 +1,15 @@
+mailto:
+ftp:
+irc:
+javascript:
+tel:
+rtmp:
+rtsp:
+webcal:
+itpc:
+line:
+zune:
+skype:
+gtalk:
+feed:
+whatsapp:

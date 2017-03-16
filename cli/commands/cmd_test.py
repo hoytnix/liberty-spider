@@ -1,6 +1,6 @@
 import click
 
-from lib.urls import sanitize_url
+from lib.urls import sanitize_url, URL
 
 
 @click.command()
@@ -17,4 +17,5 @@ def cli():
     ]
 
     for url in urls:
-        print(sanitize_url(url, origin='http://google.com'), '\n')
+        u = URL(location=url)
+        

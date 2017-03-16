@@ -2,26 +2,41 @@ import logging
 from datetime import datetime
 from random import random
 
-from sqlalchemy import Column, Integer, Boolean, DateTime, Text, String, func, exc
+from sqlalchemy import Table, Column, Integer, Boolean, DateTime, Text, String, func, exc
 from sqlalchemy.sql import exists
+from sqlalchemy.orm import relationship
+from sqlalchemy.schema import ForeignKey
 
 from lycosidae.database import Base, session
+from lycosidae.models.technology import Technology
 from lib.urls import schemeless
+
+site_technologies = Table('site_technologies', Base.metadata,
+    Column('site_id', Integer, ForeignKey('sites.id')),
+    Column('technology_id', Integer, ForeignKey('technologies.id'))
+)
 
 
 class Site(Base):
     __tablename__ = 'sites'
     id = Column(Integer, primary_key=True)
 
+    # Relationships
+    technologies = relationship("Technology", secondary=site_technologies)
+
+    # Details
     url = Column(Text)
-    wordpress = Column(Boolean, default=False)
     last_checked = Column(DateTime, default=None)
 
     def update_profile(self, profile):
         #count = 0
         #while True:
         #    try:
-        self.wordpress = profile
+        for technology in profile:
+            if profile[technology]:
+                t = Technology.select_or_insert(title=technology)
+                self.technologies.append(t)
+
         session.merge(self)
         session.commit()
         #        return

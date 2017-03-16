@@ -148,3 +148,52 @@ def tld_of(url):
 
 def schemeless(url):
     return urlparse(url)._replace(scheme='').geturl()[2:]
+
+
+class URL:
+    def __init__(self, location, origin=None):
+        """
+            TODO:
+            - [ ] TLD Blacklist
+            - [ ] Number blacklist
+            - [ ] IP blacklist
+        """
+
+        self.fqu = None
+
+        # Above all else, normalize it.
+        location = location.lower()
+
+        # Secondly, filter out keywords we don't want.
+        if keyword_blacklist(url=location):
+            return
+
+        # Catch invalid IPv6 URLs
+        try:
+            u = urlparse(location)
+        except ValueError as e:
+            return
+
+        self.tld = None
+        if not u.scheme:
+            path = u.path.split('/')[0]
+            
+
+
+    def keyword_blacklist(self, url):
+        cwd = path.dirname(path.abspath(__file__))
+        _dir = path.join(cwd, 'blacklist')
+
+        x = []
+        for (root, _, file_names) in walk(_dir):
+            for file_name in file_names:
+                fp = path.join(root, file_name)
+                with open(fp, 'r') as stream:
+                    for line in stream:
+                        l = line.strip()
+                        if l != '' and not l.startswith('#'):
+                            x.append(l)
+
+        for o in x:
+            if o in url:
+                return True        
