@@ -4,7 +4,8 @@ from lycosidae.settings import SETTINGS
 from lycosidae.log import logger
 
 from lib.http import download
-from lib.urls import sanitize_url, same_origin, domain_only
+#from lib.urls import sanitize_url, same_origin, domain_only, URL
+from lib._urls import URL
 
 
 class Scraper:
@@ -40,19 +41,14 @@ class Scraper:
         inbound = []
         outbound = []
         for link in links:
-            original_link = link + ''
-            link = sanitize_url(link, origin=site)
+            u = URL(link)
 
-            if not link:
+            if not u.domain:
                 continue
 
-            if same_origin(destination=link, origin=site):
-                inbound.append(link)
+            if site == u.domain:
+                inbound.append(u.fqu)
             else:
-                l = domain_only(link)
-                if l == '':
-                    logger.debug(link)
-                else:
-                    outbound.append(domain_only(link))
+                outbound.append(u.domain)
 
         return [x for x in set(inbound)], [x for x in set(outbound)]

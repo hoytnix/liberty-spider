@@ -33,9 +33,8 @@ class Site(Base):
         #while True:
         #    try:
         for technology in profile:
-            if profile[technology]:
-                t = Technology.select_or_insert(title=technology)
-                self.technologies.append(t)
+            t = Technology.select_or_insert(title=technology)
+            self.technologies.append(t)
 
         session.merge(self)
         session.commit()
@@ -90,7 +89,7 @@ class Site(Base):
             session.add(new_site)
             session.commit()
         else:
-            logging.info('DUPLICATE ' + url)
+            #logging.info('DUPLICATE ' + url)
             session.rollback()
 
         #        return
@@ -107,4 +106,9 @@ class Site(Base):
 
     @classmethod
     def is_unique(cls, url):
-        return session.query(exists().where(Site.url == url)).scalar()
+        does_exist = session.query(exists().where(Site.url == url)).scalar()
+        return not does_exist
+
+    @classmethod
+    def select(cls, kv):
+        return session.query(Site).filter_by(**kv).first() # TODO: should be one

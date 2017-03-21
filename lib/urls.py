@@ -29,40 +29,10 @@ def sanitize_url(url, origin=False):
     o_url = url
     url = url.lower()
 
-    # Irrelevant schemes
-    blacklist = [
-        'mailto:', 'ftp:', 'irc:', 'javascript:', 'tel:', 'rtmp:', 'rtsp:',
-        'webcal:', 'itpc:', 'line:', 'zune:', 'skype:', 'gtalk:', 'feed:',
-        'whatsapp:'
-    ]
-    for scheme in blacklist:
-        if url.startswith(scheme):
-            return False
-
     # Blacklisted domains
     blacklist = SETTINGS['URL_TLD_BLACKLIST']
     for o in blacklist:
         if url.endswith(o):
-            return False
-
-    # Blacklisted websites
-    blacklist = [
-        # ...
-        'porn', 'sex', 'hentai', 'adult', 'xxx', 'gay', 'nude', 'teen', 'ero',
-        'ebony', 'escort', 'dick',
-
-        # Too many sub-domains
-        'tumblr.com', 'deviantart.com', 'wiki', 
-
-        # Top 100 - should reduce DB requests
-        'google', 'youtube', 'facebook', 'baidu.com', 'yahoo', 
-        'wikipedia', 'qq.com', 'sohu.com', 'google.co.jp',
-        'taobao.com', 'tmall.com', 'live.com', 'amazon', 'vk.com', 
-        'twitter.com', 'instagram.com', '360.cn', 'linkedin.com',
-        'jd.com', 'reddit.com', 'wordpress.com', 
-    ]
-    for o in blacklist:
-        if o in url:
             return False
 
     # ----- Validate -----
@@ -131,27 +101,20 @@ def tld_of(url):
         else:
             one_level.append('.' + extension)
 
-    domain_tld = None
-    for extension in two_levels:
-        if url.endswith(extension):
-            domain_tld = extension
-            break
+    for x in two_levels:
+        if url.endswith(x):
+            return x
 
-    if not domain_tld:
-        for extension in one_level:
-            if url.endswith(extension):
-                domain_tld = extension
-                break
-
-    return domain_tld or False
-
+    for x in one_level:
+        if url.endswith(x):
+            return x
 
 def schemeless(url):
     return urlparse(url)._replace(scheme='').geturl()[2:]
 
 
 class URL:
-    def __init__(self, location, origin=None):
+    def __init__(self, url, origin=None):
         """
             TODO:
             - [ ] TLD Blacklist
@@ -160,25 +123,47 @@ class URL:
         """
 
         self.fqu = None
+        self.domain_only = None
 
         # Above all else, normalize it.
-        location = location.lower()
+        url = url.lower()
 
         # Secondly, filter out keywords we don't want.
-        if keyword_blacklist(url=location):
+        if self.keyword_blacklist(url=url):
             return
 
-        # Catch invalid IPv6 URLs
-        try:
-            u = urlparse(location)
-        except ValueError as e:
+        # Third, remove the scheme.
+        if ':' in url:
+            url = url.split('://')[-1]
+        url = url.split('/')[0]
+
+        # ...
+        tld = tld_of(url)
+        if not tld:
             return
 
-        self.tld = None
-        if not u.scheme:
-            path = u.path.split('/')[0]
-            
+        # TLD blacklist
+        blacklist = SETTINGS['URL_TLD_BLACKLIST']
+        for o in blacklist:
+            if url.endswith(o):
+                return
 
+        url = url.split('.')
+        self.domain_only = url[url.__len__()-tld.split('.').__len__()] + tld
+        self.fqu = 'http://' + self.domain_only
+
+        """
+        if not self.domain_only:
+            print('d', url)
+        if not self.fqu:
+            print('u', url)
+
+        # Number blacklist
+        for c in '0123456789':
+            if c in self.domain_only:
+                self.domain_only = None
+                self.fqu = None
+        """
 
     def keyword_blacklist(self, url):
         cwd = path.dirname(path.abspath(__file__))

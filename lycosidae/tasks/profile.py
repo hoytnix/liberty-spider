@@ -1,59 +1,78 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-
 from lib.http import download
 
+class Profiler(dict):
+    def __init__(self, html):
+        self.html = html.lower()
 
-class WordPress:
-    def __init__(self, url, html=None):
-        self.is_wordpress = False
-        if not html:
-            html = download(url).lower()
-        """ Homepage HTML -->
-                Let's try not to hit up too many pages. :)
-        """
-
-        # TODO: Clean this code up...
-        keys = ['wp-content', 'wp-includes', 'wp-admin']
+        self.d = {}
+        for x in dir(self):
+            if x.startswith('_Profiler__'):
+                k = x.replace('_Profiler__', '')
+                v = getattr(self, x)()
+                self.d[k] = v
+    
+    def check(self, keys):
         for key in keys:
-            if key in html:
-                self.is_wordpress = True
-                return
-        return
+            if key in self.html:
+                return True
 
-        # First check the footer.
-        if 'proudly powered by wordpress' in html.lower():
-            self.is_wordpress = True
-            return
+    def __wordpress(self):
+        keys = ['wp-content',
+                'wp-includes',
+                'wp-admin']
+        return self.check(keys)
+    
+    def __google_analytics(self):
+        keys = ['google-analytics.com/ga.js'
+                'google-analytics.com/analytics.js']
+        return self.check(keys)
+    
+    def __clicky_analytics(self):
+        keys = ['getclicky.com']
+        return self.check(keys)
+    
+    def __woocommerce(self):
+        keys = ['class="woocommerce']
+        return self.check(keys)
+    
+    def __stripe(self):
+        keys = ['js.stripe.com']
+        return self.check(keys)
+    
+    def __optimizely(self):
+        keys = ['cdn.optimizely.com/js']
+        return self.check(keys)
+    
+    def __crazy_egg(self):
+        keys = ['script.crazyegg.com']
+        return self.check(keys)
+    
+    def __mixpanel(self):
+        keys = ['cdn.mxpnl.com']
+        return self.check(keys)
+    
+    def __kissmetrics(self):
+        keys = ['i.kissmetrics.com/i.js']
+        return self.check(keys)
+    
+    def __infusionsoft(self):
+        keys = ['infusionsoft.com/app/webTracking/getTrackingCode']
+        return self.check(keys)
 
-        # Check source for wp-content folders
-        soup = BeautifulSoup(html, 'html.parser')
-        links = []
-        for link in soup.findAll('link'):
-            try:
-                if 'stylesheet' in link.get('rel'):
-                    if 'wp-content' in link.get('href'):
-                        self.is_wordpress = True
-                        return
-            except:
-                continue
-        
-        """ Page requests -->
-                These require downloading more pages.
-        """
+    def _yoast_seo(self):
+        keys = ['yoast seo plugin']
+        return self.check(keys)
 
-        # Safe: try for the license.txt
-        if False: # TODO: should be configurable from config file
-            page = urljoin(url, 'license.txt')
-            html = download(page)
-            if html:
-                if 'WordPress' in html:
-                    self.is_wordpress = True
-                    return
+    def __doubleclick(self):
+        keys = ['client="ca-pub-']
+        return self.check(keys)
 
-        # Lastly, try to hit up the login page.
-        if False:  # TODO: should be configurable from config file
-            page = urljoin(url, 'wp-login.php')
-            if download(page):  #shouldn't be 404
-                self.is_wordpress = True
-                return
+    def __hubspot(self):
+        keys = ['js.hs-scripts.com']
+        return self.check(keys)
+
+    def __hotjar(self):
+        keys = ['h,o,t,j,a,r']
+        return self.check(keys)

@@ -1,18 +1,22 @@
 import sys
 
 import requests
+import timeout_decorator
 
+from lycosidae.log import logger
 from lycosidae.settings import SETTINGS
-from lib.urls import sanitize_url
+from lib._urls import URL
 
 
-def download(url, file_path=None, original_url=None):
+def download(url, file_path=None):
     try:
-        url = sanitize_url(url, origin=original_url)
+        url = URL(url).fqu
+        if not url:
+            return False
 
         headers = {'User-Agent': 'Mozilla/5.0 (compatible)'}
 
-        r = requests.get(url, headers=headers, timeout=SETTINGS['HTTP_TIMEOUT_SECS'])
+        r = get(url, headers=headers)
         html = r.content
 
         if file_path:
@@ -23,6 +27,8 @@ def download(url, file_path=None, original_url=None):
         return html.decode('utf-8', errors='ignore')
 
     # Ignore all these exceptions.
+    except timeout_decorator.timeout_decorator.TimeoutError:
+        return False
     except requests.exceptions.ConnectTimeout:
         return False
     except requests.exceptions.ConnectionError:
@@ -34,5 +40,10 @@ def download(url, file_path=None, original_url=None):
 
     # Capture the rest.
     except:
-        print(sys.exc_info()[0], 'ORIGINAL', original_url, 'ACTUAL', url)
+        print(sys.exc_info()[0], url)
         return False
+
+
+@timeout_decorator.timeout(SETTINGS['HTTP_TIMEOUT_SECS'], use_signals=False)
+def get(url, headers):
+    return requests.get(url, headers)

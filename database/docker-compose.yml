@@ -2,7 +2,7 @@ version: '2'
 
 services:
   db:
-    image: "mysql:5.7"
+    image: mysql:5.7
     ports:
       - 3306
     environment:
@@ -11,10 +11,20 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: pass
   pma:
-    image: "phpmyadmin/phpmyadmin:latest"
+    image: phpmyadmin/phpmyadmin:latest
     ports:
       - 8080:80
     environment:
       PMA_HOST: db
       PMA_USER: user
       PMA_PASSWORD: pass
+  redis:
+    image: redis:3.2.8-alpine
+    command: redis-server --requirepass devpassword
+    ports:
+      - 6379:6379
+    volumes:
+      - 'redis:/var/lib/redis/data'
+
+volumes:
+  redis:
